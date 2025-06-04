@@ -1,0 +1,431 @@
+basePath: /
+definitions:
+  model.LoginRequest:
+    properties:
+      login:
+        example: usuario123
+        type: string
+      senha:
+        example: senhaSegura
+        type: string
+    type: object
+  model.Response:
+    properties:
+      message:
+        type: string
+    type: object
+  model.Tarefa:
+    properties:
+      conteudo_tarefa:
+        type: string
+      finalizado:
+        type: string
+      id_tarefa:
+        type: integer
+      nome_tarefa:
+        type: string
+      usuario_responsavel_tarefa:
+        type: string
+    type: object
+  model.Usuario:
+    properties:
+      id_usuario:
+        type: integer
+      login_usuario:
+        type: string
+      nome_usuario:
+        type: string
+      senha_usuario:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: suporte@exemplo.com
+    name: Suporte da API
+    url: http://www.exemplo.com/suporte
+  description: Esta é a API para gerenciamento de usuários e tarefas.
+  license:
+    name: Licença Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: API de Usuários e Tarefas
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Realiza autenticação do usuário e retorna um token JWT
+      parameters:
+      - description: Credenciais do usuário
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Efetua login
+      tags:
+      - Autenticação
+  /auth/logout:
+    post:
+      description: Simula o logout do usuário
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Efetua logout
+      tags:
+      - Autenticação
+  /tarefa:
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova tarefa no banco de dados
+      parameters:
+      - description: Dados da nova tarefa
+        in: body
+        name: tarefa
+        required: true
+        schema:
+          $ref: '#/definitions/model.Tarefa'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Tarefa'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Cria uma nova tarefa
+      tags:
+      - Tarefas
+  /tarefa/{tarefaId}:
+    delete:
+      description: Marca a tarefa como inativa em vez de removê-la do banco
+      parameters:
+      - description: ID da tarefa
+        in: path
+        name: tarefaId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Deleta (soft delete) uma tarefa por ID
+      tags:
+      - Tarefas
+    get:
+      description: Retorna os dados de uma tarefa pelo ID
+      parameters:
+      - description: ID da tarefa
+        in: path
+        name: tarefaId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Tarefa'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Busca tarefa por ID
+      tags:
+      - Tarefas
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de uma tarefa existente
+      parameters:
+      - description: ID da tarefa
+        in: path
+        name: tarefaId
+        required: true
+        type: integer
+      - description: Novos dados da tarefa
+        in: body
+        name: tarefa
+        required: true
+        schema:
+          $ref: '#/definitions/model.Tarefa'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Atualiza tarefa por ID
+      tags:
+      - Tarefas
+  /tarefas:
+    get:
+      description: Retorna todas as tarefas cadastradas
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Tarefa'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Lista todas as tarefas
+      tags:
+      - Tarefas
+  /tarefausuario/{usuarioId}:
+    get:
+      description: Retorna todas as tarefas de um usuário específico
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: usuarioId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Tarefa'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Lista tarefas por usuário
+      tags:
+      - Tarefas
+  /usuario:
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo usuário no banco de dados
+      parameters:
+      - description: Dados do novo usuário
+        in: body
+        name: usuario
+        required: true
+        schema:
+          $ref: '#/definitions/model.Usuario'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Usuario'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Cria um novo usuário
+      tags:
+      - Usuarios
+  /usuario/{usuarioId}:
+    delete:
+      description: Marca o usuário como inativo em vez de remover do banco
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: usuarioId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Deleta (soft delete) um usuário por ID
+      tags:
+      - Usuarios
+    get:
+      description: Retorna os dados de um usuário pelo ID
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: usuarioId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Usuario'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Busca usuário por ID
+      tags:
+      - Usuarios
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um usuário existente
+      parameters:
+      - description: ID do usuário
+        in: path
+        name: usuarioId
+        required: true
+        type: integer
+      - description: Novos dados do usuário
+        in: body
+        name: usuario
+        required: true
+        schema:
+          $ref: '#/definitions/model.Usuario'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Atualiza usuário por ID
+      tags:
+      - Usuarios
+  /usuarios:
+    get:
+      description: Retorna todos os usuários registrados
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Usuario'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: Lista todos os usuários
+      tags:
+      - Usuarios
+swagger: "2.0"

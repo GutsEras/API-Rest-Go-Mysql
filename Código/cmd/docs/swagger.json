@@ -1,0 +1,21 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Esta é a API para gerenciamento de usuários e tarefas.",
+        "title": "API de Usuários e Tarefas",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Suporte da API",
+            "url": "http://www.exemplo.com/suporte",
+            "email": "suporte@exemplo.com"
+        },
+        "license": {
+            "name": "Licença Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/",
+    "paths": {}
+}

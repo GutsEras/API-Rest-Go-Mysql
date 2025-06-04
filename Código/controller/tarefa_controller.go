@@ -10,17 +10,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type tarefaController struct {
+type TarefaController struct {
 	tarefaUsecase usecase.TarefaUsecase
 }
 
-func NewTarefaController(usecase usecase.TarefaUsecase) tarefaController {
-	return tarefaController{
+func NewTarefaController(usecase usecase.TarefaUsecase) TarefaController {
+	return TarefaController{
 		tarefaUsecase: usecase,
 	}
 }
 
-func (t *tarefaController) GetTarefas(ctx *gin.Context) {
+// @Summary Lista todas as tarefas
+// @Description Retorna todas as tarefas cadastradas
+// @Tags Tarefas
+// @Produce json
+// @Success 200 {array} model.Tarefa
+// @Failure 500 {object} model.Response
+// @Router /tarefas [get]
+func (t *TarefaController) GetTarefas(ctx *gin.Context) {
 	tarefas, err := t.tarefaUsecase.GetTarefas()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -29,7 +36,17 @@ func (t *tarefaController) GetTarefas(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, tarefas)
 }
 
-func (t *tarefaController) CreateTarefa(ctx *gin.Context) {
+// @Summary Cria uma nova tarefa
+// @Description Cria uma nova tarefa no banco de dados
+// @Tags Tarefas
+// @Accept json
+// @Produce json
+// @Param tarefa body model.Tarefa true "Dados da nova tarefa"
+// @Success 201 {object} model.Tarefa
+// @Failure 400 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /tarefa [post]
+func (t *TarefaController) CreateTarefa(ctx *gin.Context) {
 	var tarefa model.Tarefa
 	if err := ctx.BindJSON(&tarefa); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -45,7 +62,17 @@ func (t *tarefaController) CreateTarefa(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, insertedTarefa)
 }
 
-func (t *tarefaController) GetTarefaById(ctx *gin.Context) {
+// @Summary Busca tarefa por ID
+// @Description Retorna os dados de uma tarefa pelo ID
+// @Tags Tarefas
+// @Produce json
+// @Param tarefaId path int true "ID da tarefa"
+// @Success 200 {object} model.Tarefa
+// @Failure 400 {object} model.Response
+// @Failure 404 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /tarefa/{tarefaId} [get]
+func (t *TarefaController) GetTarefaById(ctx *gin.Context) {
 	id := ctx.Param("tarefaId")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, model.Response{Message: "Id da Tarefa não pode ser nulo"})
@@ -72,7 +99,19 @@ func (t *tarefaController) GetTarefaById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, tarefa)
 }
 
-func (t *tarefaController) UpdateTarefaById(ctx *gin.Context) {
+// @Summary Atualiza tarefa por ID
+// @Description Atualiza os dados de uma tarefa existente
+// @Tags Tarefas
+// @Accept json
+// @Produce json
+// @Param tarefaId path int true "ID da tarefa"
+// @Param tarefa body model.Tarefa true "Novos dados da tarefa"
+// @Success 200 {object} model.Response
+// @Failure 400 {object} model.Response
+// @Failure 404 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /tarefa/{tarefaId} [put]
+func (t *TarefaController) UpdateTarefaById(ctx *gin.Context) {
 	id := ctx.Param("tarefaId")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, model.Response{Message: "Id da Tarefa não pode ser nulo"})
@@ -104,7 +143,17 @@ func (t *tarefaController) UpdateTarefaById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model.Response{Message: "Tarefa atualizada com sucesso"})
 }
 
-func (t *tarefaController) SoftDeleteTarefaById(ctx *gin.Context) {
+// @Summary Deleta (soft delete) uma tarefa por ID
+// @Description Marca a tarefa como inativa em vez de removê-la do banco
+// @Tags Tarefas
+// @Produce json
+// @Param tarefaId path int true "ID da tarefa"
+// @Success 200 {object} model.Response
+// @Failure 400 {object} model.Response
+// @Failure 404 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /tarefa/{tarefaId} [delete]
+func (t *TarefaController) SoftDeleteTarefaById(ctx *gin.Context) {
 	id := ctx.Param("tarefaId")
 	if id == "" {
 		ctx.JSON(http.StatusBadRequest, model.Response{Message: "Id da Tarefa não pode ser nulo"})
@@ -130,7 +179,16 @@ func (t *tarefaController) SoftDeleteTarefaById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, model.Response{Message: "Tarefa deletada com sucesso"})
 }
 
-func (t *tarefaController) GetTarefasByUsuarioId(ctx *gin.Context) {
+// @Summary Lista tarefas por usuário
+// @Description Retorna todas as tarefas de um usuário específico
+// @Tags Tarefas
+// @Produce json
+// @Param usuarioId path string true "ID do usuário"
+// @Success 200 {array} model.Tarefa
+// @Failure 400 {object} model.Response
+// @Failure 500 {object} model.Response
+// @Router /tarefausuario/{usuarioId} [get]
+func (t *TarefaController) GetTarefasByUsuarioId(ctx *gin.Context) {
 	usuarioId := ctx.Param("usuarioId")
 	if usuarioId == "" {
 		ctx.JSON(http.StatusBadRequest, model.Response{Message: "Id do Usuário não pode ser nulo"})
